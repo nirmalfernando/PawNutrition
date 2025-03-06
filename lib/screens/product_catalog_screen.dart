@@ -5,6 +5,8 @@ import '../screens/product_detail_screen.dart';
 import '../widgets/product_card.dart';
 
 class ProductCatalogScreen extends StatefulWidget {
+  const ProductCatalogScreen({super.key});
+
   @override
   _ProductCatalogScreenState createState() => _ProductCatalogScreenState();
 }
@@ -20,7 +22,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
   }
 
   List<String> getCategories() {
-    Set<String> categories = Set<String>();
+    Set<String> categories = <String>{};
     categories.add('All');
     for (var product in products) {
       categories.add(product.category);
@@ -32,7 +34,9 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
     if (selectedCategory == 'All') {
       return products;
     } else {
-      return products.where((product) => product.category == selectedCategory).toList();
+      return products
+          .where((product) => product.category == selectedCategory)
+          .toList();
     }
   }
 
@@ -43,14 +47,14 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
     return Column(
       children: [
         // Category filter
-        Container(
+        SizedBox(
           height: 50,
           child: ListView(
             scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             children: getCategories().map((category) {
               return Padding(
-                padding: EdgeInsets.only(right: 8),
+                padding: const EdgeInsets.only(right: 8),
                 child: FilterChip(
                   label: Text(category),
                   selected: selectedCategory == category,
@@ -68,8 +72,8 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
         // Products grid
         Expanded(
           child: GridView.builder(
-            padding: EdgeInsets.all(16),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            padding: const EdgeInsets.all(16),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
               childAspectRatio: 0.7,
               crossAxisSpacing: 10,
@@ -83,7 +87,8 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => ProductDetailScreen(product: filteredProducts[index]),
+                      builder: (context) =>
+                          ProductDetailScreen(product: filteredProducts[index]),
                     ),
                   );
                 },

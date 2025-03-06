@@ -5,7 +5,8 @@ class EducationCard extends StatelessWidget {
   final EducationContent content;
   final VoidCallback onTap;
 
-  EducationCard({
+  const EducationCard({
+    super.key,
     required this.content,
     required this.onTap,
   });
@@ -13,7 +14,7 @@ class EducationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(bottom: 16),
       elevation: 2,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
@@ -30,7 +31,8 @@ class EducationCard extends StatelessWidget {
               width: double.infinity,
               decoration: BoxDecoration(
                 color: Colors.grey[300],
-                borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(12)),
               ),
               child: Center(
                 child: Icon(
@@ -42,13 +44,14 @@ class EducationCard extends StatelessWidget {
             ),
 
             Padding(
-              padding: EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Category
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                     decoration: BoxDecoration(
                       color: Theme.of(context).primaryColor.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(16),
@@ -62,17 +65,17 @@ class EducationCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                  SizedBox(height: 12),
+                  const SizedBox(height: 12),
 
                   // Title
                   Text(
                     content.title,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
 
                   // Summary
                   Text(
@@ -82,7 +85,7 @@ class EducationCard extends StatelessWidget {
                       height: 1.5,
                     ),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
 
                   // Read more button
                   Row(

@@ -5,7 +5,8 @@ class ProductCard extends StatelessWidget {
   final Product product;
   final VoidCallback onTap;
 
-  ProductCard({
+  const ProductCard({
+    super.key,
     required this.product,
     required this.onTap,
   });
@@ -24,7 +25,8 @@ class ProductCard extends StatelessWidget {
           children: [
             // Product image
             ClipRRect(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(10)),
               child: Container(
                 height: 120,
                 width: double.infinity,
@@ -40,21 +42,21 @@ class ProductCard extends StatelessWidget {
             ),
 
             Padding(
-              padding: EdgeInsets.all(8),
+              padding: const EdgeInsets.all(8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Product name
                   Text(
                     product.name,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
 
                   // Price
                   Text(
@@ -64,22 +66,22 @@ class ProductCard extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
 
                   // Rating
                   Row(
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.star,
                         size: 16,
                         color: Colors.amber,
                       ),
-                      SizedBox(width: 4),
+                      const SizedBox(width: 4),
                       Text(
                         '${product.rating}',
-                        style: TextStyle(fontSize: 12),
+                        style: const TextStyle(fontSize: 12),
                       ),
-                      SizedBox(width: 4),
+                      const SizedBox(width: 4),
                       Text(
                         '(${product.reviewCount})',
                         style: TextStyle(

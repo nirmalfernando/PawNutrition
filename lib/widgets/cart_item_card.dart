@@ -5,7 +5,8 @@ class CartItemCard extends StatelessWidget {
   final CartItem cartItem;
   final Function(int) onQuantityChanged;
 
-  CartItemCard({
+  const CartItemCard({
+    super.key,
     required this.cartItem,
     required this.onQuantityChanged,
   });
@@ -18,7 +19,7 @@ class CartItemCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
       ),
       child: Padding(
-        padding: EdgeInsets.all(12),
+        padding: const EdgeInsets.all(12),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -38,7 +39,7 @@ class CartItemCard extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(width: 12),
+            const SizedBox(width: 12),
 
             // Product details
             Expanded(
@@ -47,14 +48,14 @@ class CartItemCard extends StatelessWidget {
                 children: [
                   Text(
                     cartItem.product.name,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
                     '\$${cartItem.product.price.toStringAsFixed(2)}',
                     style: TextStyle(
@@ -62,7 +63,7 @@ class CartItemCard extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Row(
                     children: [
                       _buildQuantityButton(
@@ -71,14 +72,14 @@ class CartItemCard extends StatelessWidget {
                           onQuantityChanged(cartItem.quantity - 1);
                         },
                       ),
-                      SizedBox(width: 8),
+                      const SizedBox(width: 8),
                       Text(
                         '${cartItem.quantity}',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(width: 8),
+                      const SizedBox(width: 8),
                       _buildQuantityButton(
                         icon: Icons.add,
                         onPressed: () {
@@ -98,12 +99,12 @@ class CartItemCard extends StatelessWidget {
               children: [
                 Text(
                   '\$${cartItem.totalPrice.toStringAsFixed(2)}',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
                   ),
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 GestureDetector(
                   onTap: () {
                     onQuantityChanged(0);

@@ -4,6 +4,8 @@ import '../models/education_content.dart';
 import '../widgets/education_card.dart';
 
 class EducationScreen extends StatefulWidget {
+  const EducationScreen({super.key});
+
   @override
   _EducationScreenState createState() => _EducationScreenState();
 }
@@ -19,7 +21,7 @@ class _EducationScreenState extends State<EducationScreen> {
   }
 
   List<String> getCategories() {
-    Set<String> categories = Set<String>();
+    Set<String> categories = <String>{};
     categories.add('All');
     for (var content in educationContent) {
       categories.add(content.category);
@@ -31,7 +33,9 @@ class _EducationScreenState extends State<EducationScreen> {
     if (selectedCategory == 'All') {
       return educationContent;
     } else {
-      return educationContent.where((content) => content.category == selectedCategory).toList();
+      return educationContent
+          .where((content) => content.category == selectedCategory)
+          .toList();
     }
   }
 
@@ -42,14 +46,14 @@ class _EducationScreenState extends State<EducationScreen> {
     return Column(
       children: [
         // Category filter
-        Container(
+        SizedBox(
           height: 50,
           child: ListView(
             scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             children: getCategories().map((category) {
               return Padding(
-                padding: EdgeInsets.only(right: 8),
+                padding: const EdgeInsets.only(right: 8),
                 child: FilterChip(
                   label: Text(category),
                   selected: selectedCategory == category,
@@ -67,7 +71,7 @@ class _EducationScreenState extends State<EducationScreen> {
         // Education content list
         Expanded(
           child: ListView.builder(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             itemCount: filteredContent.length,
             itemBuilder: (context, index) {
               return EducationCard(
@@ -76,7 +80,8 @@ class _EducationScreenState extends State<EducationScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => EducationDetailScreen(content: filteredContent[index]),
+                      builder: (context) => EducationDetailScreen(
+                          content: filteredContent[index]),
                     ),
                   );
                 },
@@ -92,7 +97,7 @@ class _EducationScreenState extends State<EducationScreen> {
 class EducationDetailScreen extends StatelessWidget {
   final EducationContent content;
 
-  EducationDetailScreen({required this.content});
+  const EducationDetailScreen({super.key, required this.content});
 
   @override
   Widget build(BuildContext context) {
@@ -119,19 +124,19 @@ class EducationDetailScreen extends StatelessWidget {
             ),
 
             Padding(
-              padding: EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Title
                   Text(
                     content.title,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
 
                   // Summary
                   Text(
@@ -142,28 +147,28 @@ class EducationDetailScreen extends StatelessWidget {
                       color: Colors.grey[700],
                     ),
                   ),
-                  SizedBox(height: 24),
+                  const SizedBox(height: 24),
 
                   // Full content
                   Text(
                     content.content,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                       height: 1.6,
                     ),
                   ),
 
-                  SizedBox(height: 32),
+                  const SizedBox(height: 32),
 
                   // Related products section
-                  Text(
+                  const Text(
                     'Recommended Products',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
 
                   // This would normally be populated with actual related products
                   ListTile(
@@ -174,17 +179,17 @@ class EducationDetailScreen extends StatelessWidget {
                         color: Colors.grey[300],
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: Icon(Icons.pets),
+                      child: const Icon(Icons.pets),
                     ),
-                    title: Text('Premium Dry Dog Food'),
-                    subtitle: Text('\$49.99'),
-                    trailing: Icon(Icons.arrow_forward_ios, size: 16),
+                    title: const Text('Premium Dry Dog Food'),
+                    subtitle: const Text('\$49.99'),
+                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                     onTap: () {
                       // Navigate to product detail
                     },
                   ),
 
-                  Divider(),
+                  const Divider(),
 
                   ListTile(
                     leading: Container(
@@ -194,11 +199,11 @@ class EducationDetailScreen extends StatelessWidget {
                         color: Colors.grey[300],
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: Icon(Icons.pets),
+                      child: const Icon(Icons.pets),
                     ),
-                    title: Text('Salmon Oil Supplement'),
-                    subtitle: Text('\$24.99'),
-                    trailing: Icon(Icons.arrow_forward_ios, size: 16),
+                    title: const Text('Salmon Oil Supplement'),
+                    subtitle: const Text('\$24.99'),
+                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                     onTap: () {
                       // Navigate to product detail
                     },

@@ -7,6 +7,8 @@ import '../widgets/cart_item_card.dart';
 List<CartItem> cart = []; // Fixed declaration
 
 class CartScreen extends StatefulWidget {
+  const CartScreen({super.key});
+
   @override
   _CartScreenState createState() => _CartScreenState();
 }
@@ -47,22 +49,22 @@ class _CartScreenState extends State<CartScreen> {
             size: 80,
             color: Colors.grey[400],
           ),
-          SizedBox(height: 16),
-          Text(
+          const SizedBox(height: 16),
+          const Text(
             'Your cart is empty',
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Text(
             'Browse our products and add items to your cart',
             style: TextStyle(
               color: Colors.grey[600],
             ),
           ),
-          SizedBox(height: 24),
+          const SizedBox(height: 24),
           ElevatedButton(
             onPressed: () {
               // Navigate to products tab using Navigator instead
@@ -70,7 +72,7 @@ class _CartScreenState extends State<CartScreen> {
                 MaterialPageRoute(builder: (context) => HomeScreen()),
               );
             },
-            child: Text('START SHOPPING'),
+            child: const Text('START SHOPPING'),
           ),
         ],
       ),
@@ -82,9 +84,9 @@ class _CartScreenState extends State<CartScreen> {
       children: [
         Expanded(
           child: ListView.separated(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             itemCount: cart.length,
-            separatorBuilder: (context, index) => SizedBox(height: 12),
+            separatorBuilder: (context, index) => const SizedBox(height: 12),
             itemBuilder: (context, index) {
               return CartItemCard(
                 cartItem: cart[index],
@@ -102,8 +104,8 @@ class _CartScreenState extends State<CartScreen> {
 
   Widget _buildOrderSummary(double subtotal, double shipping, double total) {
     return Container(
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
+      padding: const EdgeInsets.all(16),
+      decoration: const BoxDecoration(
         color: Colors.white,
         boxShadow: [
           BoxShadow(
@@ -119,23 +121,23 @@ class _CartScreenState extends State<CartScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Subtotal'),
+              const Text('Subtotal'),
               Text('\$${subtotal.toStringAsFixed(2)}'),
             ],
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Shipping'),
+              const Text('Shipping'),
               Text('\$${shipping.toStringAsFixed(2)}'),
             ],
           ),
-          Divider(height: 24),
+          const Divider(height: 24),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
+              const Text(
                 'Total',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
@@ -144,27 +146,27 @@ class _CartScreenState extends State<CartScreen> {
               ),
               Text(
                 '\$${total.toStringAsFixed(2)}',
-                style: TextStyle(
+                style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
                 ),
               ),
             ],
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           ElevatedButton(
             onPressed: () {
               // Implement checkout process
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
+                const SnackBar(
                   content: Text('Proceeding to checkout...'),
                 ),
               );
             },
-            child: Text('CHECKOUT'),
             style: ElevatedButton.styleFrom(
-              padding: EdgeInsets.symmetric(vertical: 16),
+              padding: const EdgeInsets.symmetric(vertical: 16),
             ),
+            child: Text('CHECKOUT'),
           ),
         ],
       ),

@@ -8,11 +8,12 @@ List<CartItem> cart = [];
 class ProductDetailScreen extends StatelessWidget {
   final Product product;
 
-  ProductDetailScreen({required this.product});
+  const ProductDetailScreen({super.key, required this.product});
 
   void addToCart(BuildContext context) {
     // Check if product is already in cart
-    int existingIndex = cart.indexWhere((item) => item.product.id == product.id);
+    int existingIndex =
+        cart.indexWhere((item) => item.product.id == product.id);
 
     if (existingIndex >= 0) {
       // Increment quantity if already in cart
@@ -25,7 +26,7 @@ class ProductDetailScreen extends StatelessWidget {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('${product.name} added to cart'),
-        duration: Duration(seconds: 2),
+        duration: const Duration(seconds: 2),
         action: SnackBarAction(
           label: 'VIEW CART',
           onPressed: () {
@@ -41,7 +42,7 @@ class ProductDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Product Details'),
+        title: const Text('Product Details'),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -62,19 +63,19 @@ class ProductDetailScreen extends StatelessWidget {
             ),
 
             Padding(
-              padding: EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Product name and category
                   Text(
                     product.name,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
 
                   Text(
                     product.category,
@@ -83,7 +84,7 @@ class ProductDetailScreen extends StatelessWidget {
                       fontSize: 16,
                     ),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
 
                   // Price and rating
                   Row(
@@ -99,19 +100,19 @@ class ProductDetailScreen extends StatelessWidget {
                       ),
                       Row(
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.star,
                             color: Colors.amber,
                           ),
-                          SizedBox(width: 4),
+                          const SizedBox(width: 4),
                           Text(
                             '${product.rating}',
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          SizedBox(width: 4),
+                          const SizedBox(width: 4),
                           Text(
                             '(${product.reviewCount} reviews)',
                             style: TextStyle(
@@ -122,48 +123,48 @@ class ProductDetailScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  SizedBox(height: 24),
+                  const SizedBox(height: 24),
 
                   // Description
-                  Text(
+                  const Text(
                     'Description',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
                     product.description,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                       height: 1.5,
                     ),
                   ),
-                  SizedBox(height: 32),
+                  const SizedBox(height: 32),
 
                   // Customer reviews
-                  Text(
+                  const Text(
                     'Customer Reviews',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
 
                   // This would normally be a ListView of actual reviews
                   ListTile(
-                    leading: CircleAvatar(
+                    leading: const CircleAvatar(
                       child: Icon(Icons.person),
                     ),
                     title: Row(
                       children: [
-                        Text('Sarah M.'),
-                        SizedBox(width: 8),
+                        const Text('Sarah M.'),
+                        const SizedBox(width: 8),
                         Row(
                           children: List.generate(5, (index) {
-                            return Icon(
+                            return const Icon(
                               Icons.star,
                               size: 16,
                               color: Colors.amber,
@@ -172,20 +173,21 @@ class ProductDetailScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                    subtitle: Text('My dog loves this food! His coat looks healthier and he has more energy since we switched.'),
+                    subtitle: const Text(
+                        'My dog loves this food! His coat looks healthier and he has more energy since we switched.'),
                   ),
 
                   ListTile(
-                    leading: CircleAvatar(
+                    leading: const CircleAvatar(
                       child: Icon(Icons.person),
                     ),
                     title: Row(
                       children: [
-                        Text('Mike T.'),
-                        SizedBox(width: 8),
+                        const Text('Mike T.'),
+                        const SizedBox(width: 8),
                         Row(
                           children: List.generate(4, (index) {
-                            return Icon(
+                            return const Icon(
                               Icons.star,
                               size: 16,
                               color: Colors.amber,
@@ -194,7 +196,8 @@ class ProductDetailScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                    subtitle: Text('Good quality for the price. My picky eater actually enjoys this food.'),
+                    subtitle: const Text(
+                        'Good quality for the price. My picky eater actually enjoys this food.'),
                   ),
                 ],
               ),
@@ -203,8 +206,8 @@ class ProductDetailScreen extends StatelessWidget {
         ),
       ),
       bottomNavigationBar: Container(
-        padding: EdgeInsets.all(16),
-        decoration: BoxDecoration(
+        padding: const EdgeInsets.all(16),
+        decoration: const BoxDecoration(
           color: Colors.white,
           boxShadow: [
             BoxShadow(
@@ -216,10 +219,10 @@ class ProductDetailScreen extends StatelessWidget {
         ),
         child: ElevatedButton(
           onPressed: () => addToCart(context),
-          child: Text('ADD TO CART'),
           style: ElevatedButton.styleFrom(
-            padding: EdgeInsets.symmetric(vertical: 16),
+            padding: const EdgeInsets.symmetric(vertical: 16),
           ),
+          child: Text('ADD TO CART'),
         ),
       ),
     );
