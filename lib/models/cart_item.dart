@@ -9,5 +9,6 @@ class CartItem {
     this.quantity = 1,
   });
 
+  // Calculate total price for this item
   double get totalPrice => product.price * quantity;
 }

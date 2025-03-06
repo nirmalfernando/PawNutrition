@@ -1,41 +1,57 @@
 import 'package:flutter/material.dart';
 import '../models/product.dart';
-import '../models/cart_item.dart';
-
-// This would normally be a proper state management solution
-List<CartItem> cart = [];
+import '../data/database_helper.dart';
+import '../screens/cart_screen.dart';
+import '../screens/home_screen.dart';
 
 class ProductDetailScreen extends StatelessWidget {
   final Product product;
+  final DatabaseHelper _dbHelper = DatabaseHelper();
 
-  const ProductDetailScreen({super.key, required this.product});
+  ProductDetailScreen({super.key, required this.product});
 
-  void addToCart(BuildContext context) {
-    // Check if product is already in cart
-    int existingIndex =
-        cart.indexWhere((item) => item.product.id == product.id);
+  Future<void> addToCart(BuildContext context) async {
+    try {
+      // Check if product exists in database first
+      List<Product> products = await _dbHelper.getProducts();
+      bool productExists = products.any((p) => p.id == product.id);
 
-    if (existingIndex >= 0) {
-      // Increment quantity if already in cart
-      cart[existingIndex].quantity += 1;
-    } else {
-      // Add new item to cart
-      cart.add(CartItem(product: product));
-    }
+      if (!productExists) {
+        print("Product doesn't exist in database, inserting it first");
+        await _dbHelper.insertProduct(product);
+      }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('${product.name} added to cart'),
-        duration: const Duration(seconds: 2),
-        action: SnackBarAction(
-          label: 'VIEW CART',
-          onPressed: () {
-            Navigator.pop(context);
-            // This would normally navigate directly to cart tab
-          },
+      // Debug the database state
+      await _dbHelper.debugDatabase();
+
+      // Add to cart
+      await _dbHelper.addToCart(product.id, 1);
+
+      // Debug again to confirm addition
+      await _dbHelper.debugDatabase();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${product.name} added to cart'),
+          duration: const Duration(seconds: 2),
+          action: SnackBarAction(
+            label: 'VIEW CART',
+            onPressed: () {
+              // Use the static method to navigate to the cart tab
+              HomeScreen.navigateToCart(context);
+            },
+          ),
         ),
-      ),
-    );
+      );
+    } catch (e) {
+      print("Error adding to cart: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to add item to cart: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   @override
@@ -123,6 +139,13 @@ class ProductDetailScreen extends StatelessWidget {
                       ),
                     ],
                   ),
+                  Text(
+                    "Product ID: ${product.id}",
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey[600],
+                    ),
+                  ),
                   const SizedBox(height: 24),
 
                   // Description
@@ -153,7 +176,7 @@ class ProductDetailScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
 
-                  // This would normally be a ListView of actual reviews
+                  // Reviews
                   ListTile(
                     leading: const CircleAvatar(
                       child: Icon(Icons.person),
@@ -217,12 +240,18 @@ class ProductDetailScreen extends StatelessWidget {
             ),
           ],
         ),
-        child: ElevatedButton(
-          onPressed: () => addToCart(context),
-          style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(vertical: 16),
-          ),
-          child: Text('ADD TO CART'),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ElevatedButton(
+              onPressed: () => addToCart(context),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                minimumSize: const Size(double.infinity, 50),
+              ),
+              child: const Text('ADD TO CART'),
+            ),
+          ],
         ),
       ),
     );

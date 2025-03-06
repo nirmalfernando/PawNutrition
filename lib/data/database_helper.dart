@@ -100,6 +100,19 @@ class DatabaseHelper {
   Future<int> addToCart(int productId, int quantity) async {
     Database db = await database;
 
+    // Debug - check if product exists
+    final product = await db.query(
+      'products',
+      where: 'id = ?',
+      whereArgs: [productId],
+    );
+
+    if (product.isEmpty) {
+      print(
+          "WARNING: Trying to add non-existent product with ID $productId to cart");
+      throw Exception("Product not found in database");
+    }
+
     // Check if product is already in cart
     List<Map<String, dynamic>> existing = await db.query(
       'cart',
@@ -127,30 +140,48 @@ class DatabaseHelper {
   Future<List<CartItem>> getCartItems() async {
     Database db = await database;
 
-    // Join cart and products tables
-    List<Map<String, dynamic>> maps = await db.rawQuery('''
-      SELECT c.*, p.*
-      FROM cart c
-      JOIN products p ON c.productId = p.id
-    ''');
+    try {
+      // First check if there are any items in cart
+      final cartCount =
+          Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM cart'));
+      print("Cart item count: $cartCount");
 
-    return List.generate(maps.length, (i) {
-      Product product = Product(
-        id: maps[i]['id'],
-        name: maps[i]['name'],
-        description: maps[i]['description'],
-        price: maps[i]['price'],
-        imageUrl: maps[i]['imageUrl'],
-        rating: maps[i]['rating'],
-        reviewCount: maps[i]['reviewCount'],
-        category: maps[i]['category'],
-      );
+      if (cartCount == 0) {
+        return [];
+      }
 
-      return CartItem(
-        product: product,
-        quantity: maps[i]['quantity'],
-      );
-    });
+      // Join cart and products tables with alias to avoid column name conflicts
+      List<Map<String, dynamic>> maps = await db.rawQuery('''
+        SELECT c.id as cart_id, c.quantity, 
+               p.id, p.name, p.description, p.price, p.imageUrl, 
+               p.rating, p.reviewCount, p.category
+        FROM cart c
+        JOIN products p ON c.productId = p.id
+      ''');
+
+      print("Raw query results: $maps");
+
+      return List.generate(maps.length, (i) {
+        Product product = Product(
+          id: maps[i]['id'],
+          name: maps[i]['name'],
+          description: maps[i]['description'],
+          price: maps[i]['price'],
+          imageUrl: maps[i]['imageUrl'],
+          rating: maps[i]['rating'],
+          reviewCount: maps[i]['reviewCount'],
+          category: maps[i]['category'],
+        );
+
+        return CartItem(
+          product: product,
+          quantity: maps[i]['quantity'],
+        );
+      });
+    } catch (e) {
+      print("Error getting cart items: $e");
+      rethrow; // Re-throw the error after logging it
+    }
   }
 
   Future<int> updateCartItemQuantity(int productId, int quantity) async {
@@ -175,5 +206,31 @@ class DatabaseHelper {
   Future<int> clearCart() async {
     Database db = await database;
     return await db.delete('cart');
+  }
+
+  // Debug method to check database state
+  Future<void> debugDatabase() async {
+    Database db = await database;
+
+    print("--- DEBUG DATABASE ---");
+
+    // Check if tables exist
+    var tables =
+        await db.rawQuery("SELECT name FROM sqlite_master WHERE type='table'");
+    print("Tables: $tables");
+
+    // Check product count
+    var productCount = await db.rawQuery("SELECT COUNT(*) FROM products");
+    print("Product count: $productCount");
+
+    // Check cart count
+    var cartCount = await db.rawQuery("SELECT COUNT(*) FROM cart");
+    print("Cart count: $cartCount");
+
+    // See cart contents
+    var cartItems = await db.query("cart");
+    print("Cart items: $cartItems");
+
+    print("--- END DEBUG ---");
   }
 }

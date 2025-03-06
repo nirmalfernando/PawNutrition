@@ -1,10 +1,8 @@
-import 'package:dog_nutrition_app/screens/home_screen.dart';
 import 'package:flutter/material.dart';
+import '../data/database_helper.dart';
 import '../models/cart_item.dart';
 import '../widgets/cart_item_card.dart';
-
-// In a real app, you'd use proper state management like Provider or Bloc
-List<CartItem> cart = []; // Fixed declaration
+import 'home_screen.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -14,32 +12,122 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
-  void updateQuantity(int index, int newQuantity) {
+  final DatabaseHelper _dbHelper = DatabaseHelper();
+  List<CartItem> cart = [];
+  bool _isLoading = true;
+  String _errorMessage = "";
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCartItems();
+  }
+
+  // Make sure to call this when returning to the cart tab
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _loadCartItems();
+  }
+
+  Future<void> _loadCartItems() async {
+    if (!mounted) return;
+
     setState(() {
-      if (newQuantity <= 0) {
-        cart.removeAt(index);
-      } else {
-        cart[index].quantity = newQuantity;
-      }
+      _isLoading = true;
+      _errorMessage = "";
     });
+
+    try {
+      final items = await _dbHelper.getCartItems();
+
+      // Debug print to check what we're getting from the database
+      print("Cart items loaded: ${items.length}");
+      for (var item in items) {
+        print("Item: ${item.product.name}, Quantity: ${item.quantity}");
+      }
+
+      if (mounted) {
+        setState(() {
+          cart = items;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      print("Error loading cart: $e");
+      if (mounted) {
+        setState(() {
+          _errorMessage = "Failed to load cart: $e";
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> updateQuantity(int productId, int newQuantity) async {
+    try {
+      await _dbHelper.updateCartItemQuantity(productId, newQuantity);
+      // Debug print
+      print("Updated product $productId to quantity $newQuantity");
+      await _loadCartItems(); // Reload cart items from database
+    } catch (e) {
+      print("Error updating quantity: $e");
+      if (mounted) {
+        setState(() {
+          _errorMessage = "Failed to update quantity: $e";
+        });
+      }
+    }
+  }
+
+  Future<void> clearEntireCart() async {
+    try {
+      await _dbHelper.clearCart();
+      await _loadCartItems();
+    } catch (e) {
+      print("Error clearing cart: $e");
+    }
   }
 
   double getSubtotal() {
-    return cart.fold(0, (total, item) => total + item.totalPrice);
+    return cart.fold(
+        0, (total, item) => total + (item.product.price * item.quantity));
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (_errorMessage.isNotEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.error_outline, size: 48, color: Colors.red),
+            const SizedBox(height: 16),
+            Text(_errorMessage),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _loadCartItems,
+              child: const Text('Try Again'),
+            )
+          ],
+        ),
+      );
+    }
+
     final subtotal = getSubtotal();
     final shipping = subtotal > 0 ? 5.99 : 0.0;
     final total = subtotal + shipping;
 
     return cart.isEmpty
-        ? _buildEmptyCart()
+        ? _buildEmptyCart(context)
         : _buildCartWithItems(subtotal, shipping, total);
   }
 
-  Widget _buildEmptyCart() {
+  Widget _buildEmptyCart(BuildContext context) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -67,7 +155,6 @@ class _CartScreenState extends State<CartScreen> {
           const SizedBox(height: 24),
           ElevatedButton(
             onPressed: () {
-              // Navigate to products tab using Navigator instead
               Navigator.of(context).pushReplacement(
                 MaterialPageRoute(builder: (context) => HomeScreen()),
               );
@@ -82,6 +169,26 @@ class _CartScreenState extends State<CartScreen> {
   Widget _buildCartWithItems(double subtotal, double shipping, double total) {
     return Column(
       children: [
+        // Debug buttons for testing
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              TextButton.icon(
+                icon: const Icon(Icons.refresh),
+                label: const Text('Refresh'),
+                onPressed: _loadCartItems,
+              ),
+              TextButton.icon(
+                icon: const Icon(Icons.delete),
+                label: const Text('Clear All'),
+                style: TextButton.styleFrom(foregroundColor: Colors.red),
+                onPressed: clearEntireCart,
+              ),
+            ],
+          ),
+        ),
         Expanded(
           child: ListView.separated(
             padding: const EdgeInsets.all(16),
@@ -91,7 +198,7 @@ class _CartScreenState extends State<CartScreen> {
               return CartItemCard(
                 cartItem: cart[index],
                 onQuantityChanged: (newQuantity) {
-                  updateQuantity(index, newQuantity);
+                  updateQuantity(cart[index].product.id, newQuantity);
                 },
               );
             },
@@ -166,7 +273,7 @@ class _CartScreenState extends State<CartScreen> {
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),
             ),
-            child: Text('CHECKOUT'),
+            child: const Text('CHECKOUT'),
           ),
         ],
       ),
