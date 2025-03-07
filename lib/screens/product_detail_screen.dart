@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../models/product.dart';
 import '../data/database_helper.dart';
 import '../screens/cart_screen.dart';
 import '../screens/home_screen.dart';
+import '../services/navigation_service.dart';
 
 class ProductDetailScreen extends StatelessWidget {
   final Product product;
@@ -37,8 +39,11 @@ class ProductDetailScreen extends StatelessWidget {
           action: SnackBarAction(
             label: 'VIEW CART',
             onPressed: () {
-              // Use the static method to navigate to the cart tab
-              HomeScreen.navigateToCart(context);
+              // Navigate to home screen first if needed
+              Navigator.of(context).popUntil((route) => route.isFirst);
+              // Use the navigation service
+              Provider.of<NavigationService>(context, listen: false)
+                  .setCurrentTab(1);
             },
           ),
         ),

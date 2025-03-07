@@ -2,6 +2,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import '../models/product.dart';
 import '../models/cart_item.dart';
+import '../models/user.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper _instance = DatabaseHelper._internal();
@@ -21,8 +22,9 @@ class DatabaseHelper {
     String path = join(await getDatabasesPath(), 'dog_nutrition.db');
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: _onCreate,
+      onUpgrade: _onUpgrade,
     );
   }
 
@@ -62,6 +64,273 @@ class DatabaseHelper {
         category TEXT
       )
     ''');
+
+    // Users table
+    await db.execute('''
+      CREATE TABLE users(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        email TEXT UNIQUE,
+        name TEXT,
+        password TEXT,
+        photoUrl TEXT,
+        phone TEXT
+      )
+    ''');
+
+    // Addresses table
+    await db.execute('''
+      CREATE TABLE addresses(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        userId INTEGER,
+        name TEXT,
+        street TEXT,
+        city TEXT,
+        state TEXT,
+        zipCode TEXT,
+        isDefault INTEGER,
+        FOREIGN KEY (userId) REFERENCES users(id)
+      )
+    ''');
+
+    // Payment methods table
+    await db.execute('''
+      CREATE TABLE payment_methods(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        userId INTEGER,
+        cardType TEXT,
+        lastFourDigits TEXT,
+        cardholderName TEXT,
+        expiryDate TEXT,
+        isDefault INTEGER,
+        FOREIGN KEY (userId) REFERENCES users(id)
+      )
+    ''');
+  }
+
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      // Add new tables for version 2
+      await db.execute('''
+        CREATE TABLE users(
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          email TEXT UNIQUE,
+          name TEXT,
+          password TEXT,
+          photoUrl TEXT,
+          phone TEXT
+        )
+      ''');
+
+      await db.execute('''
+        CREATE TABLE addresses(
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          userId INTEGER,
+          name TEXT,
+          street TEXT,
+          city TEXT,
+          state TEXT,
+          zipCode TEXT,
+          isDefault INTEGER,
+          FOREIGN KEY (userId) REFERENCES users(id)
+        )
+      ''');
+
+      await db.execute('''
+        CREATE TABLE payment_methods(
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          userId INTEGER,
+          cardType TEXT,
+          lastFourDigits TEXT,
+          cardholderName TEXT,
+          expiryDate TEXT,
+          isDefault INTEGER,
+          FOREIGN KEY (userId) REFERENCES users(id)
+        )
+      ''');
+    }
+  }
+
+  // User operations
+  Future<int> registerUser(String email, String name, String password) async {
+    Database db = await database;
+    return await db.insert('users', {
+      'email': email,
+      'name': name,
+      'password': password, // In production, this should be hashed
+    });
+  }
+
+  Future<User?> loginUser(String email, String password) async {
+    Database db = await database;
+    List<Map<String, dynamic>> maps = await db.query(
+      'users',
+      where: 'email = ? AND password = ?',
+      whereArgs: [email, password],
+    );
+
+    if (maps.isNotEmpty) {
+      User user = User.fromMap(maps.first);
+
+      // Load addresses
+      List<Map<String, dynamic>> addressMaps = await db.query(
+        'addresses',
+        where: 'userId = ?',
+        whereArgs: [user.id],
+      );
+
+      // Load payment methods
+      List<Map<String, dynamic>> paymentMaps = await db.query(
+        'payment_methods',
+        where: 'userId = ?',
+        whereArgs: [user.id],
+      );
+
+      user.addresses = addressMaps.map((map) => Address.fromMap(map)).toList();
+      user.paymentMethods =
+          paymentMaps.map((map) => PaymentMethod.fromMap(map)).toList();
+
+      return user;
+    }
+    return null;
+  }
+
+  Future<User?> getUserById(int id) async {
+    Database db = await database;
+    List<Map<String, dynamic>> maps = await db.query(
+      'users',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+
+    if (maps.isNotEmpty) {
+      User user = User.fromMap(maps.first);
+
+      // Load addresses
+      List<Map<String, dynamic>> addressMaps = await db.query(
+        'addresses',
+        where: 'userId = ?',
+        whereArgs: [user.id],
+      );
+
+      // Load payment methods
+      List<Map<String, dynamic>> paymentMaps = await db.query(
+        'payment_methods',
+        where: 'userId = ?',
+        whereArgs: [user.id],
+      );
+
+      user.addresses = addressMaps.map((map) => Address.fromMap(map)).toList();
+      user.paymentMethods =
+          paymentMaps.map((map) => PaymentMethod.fromMap(map)).toList();
+
+      return user;
+    }
+    return null;
+  }
+
+  Future<int> updateUserProfile(User user) async {
+    Database db = await database;
+    return await db.update(
+      'users',
+      user.toMap(),
+      where: 'id = ?',
+      whereArgs: [user.id],
+    );
+  }
+
+  // Address operations
+  Future<int> addAddress(int userId, Address address) async {
+    Database db = await database;
+
+    // If this is set as default, clear other defaults first
+    if (address.isDefault) {
+      await db.update('addresses', {'isDefault': 0},
+          where: 'userId = ?', whereArgs: [userId]);
+    }
+
+    return await db.insert('addresses', {
+      'userId': userId,
+      'name': address.name,
+      'street': address.street,
+      'city': address.city,
+      'state': address.state,
+      'zipCode': address.zipCode,
+      'isDefault': address.isDefault ? 1 : 0,
+    });
+  }
+
+  Future<int> updateAddress(Address address) async {
+    Database db = await database;
+
+    // If this is set as default, clear other defaults first
+    if (address.isDefault) {
+      await db.rawQuery(
+          'UPDATE addresses SET isDefault = 0 WHERE userId = (SELECT userId FROM addresses WHERE id = ?)',
+          [address.id]);
+    }
+
+    return await db.update(
+      'addresses',
+      address.toMap(),
+      where: 'id = ?',
+      whereArgs: [address.id],
+    );
+  }
+
+  Future<int> deleteAddress(int addressId) async {
+    Database db = await database;
+    return await db.delete(
+      'addresses',
+      where: 'id = ?',
+      whereArgs: [addressId],
+    );
+  }
+
+  // Payment method operations
+  Future<int> addPaymentMethod(int userId, PaymentMethod paymentMethod) async {
+    Database db = await database;
+
+    // If this is set as default, clear other defaults first
+    if (paymentMethod.isDefault) {
+      await db.update('payment_methods', {'isDefault': 0},
+          where: 'userId = ?', whereArgs: [userId]);
+    }
+
+    return await db.insert('payment_methods', {
+      'userId': userId,
+      'cardType': paymentMethod.cardType,
+      'lastFourDigits': paymentMethod.lastFourDigits,
+      'cardholderName': paymentMethod.cardholderName,
+      'expiryDate': paymentMethod.expiryDate,
+      'isDefault': paymentMethod.isDefault ? 1 : 0,
+    });
+  }
+
+  Future<int> updatePaymentMethod(PaymentMethod paymentMethod) async {
+    Database db = await database;
+
+    // If this is set as default, clear other defaults first
+    if (paymentMethod.isDefault) {
+      await db.rawQuery(
+          'UPDATE payment_methods SET isDefault = 0 WHERE userId = (SELECT userId FROM payment_methods WHERE id = ?)',
+          [paymentMethod.id]);
+    }
+
+    return await db.update(
+      'payment_methods',
+      paymentMethod.toMap(),
+      where: 'id = ?',
+      whereArgs: [paymentMethod.id],
+    );
+  }
+
+  Future<int> deletePaymentMethod(int paymentMethodId) async {
+    Database db = await database;
+    return await db.delete(
+      'payment_methods',
+      where: 'id = ?',
+      whereArgs: [paymentMethodId],
+    );
   }
 
   // Product operations

@@ -1,50 +1,52 @@
-import 'dart:core';
-
 import 'package:flutter/material.dart';
 import '../screens/product_catalog_screen.dart';
 import '../screens/cart_screen.dart';
 import '../screens/education_screen.dart';
+import '../screens/user_profile_screen.dart';
+import 'package:provider/provider.dart';
+import '../services/auth_service.dart';
+import '../services/navigation_service.dart';
 
 class HomeScreen extends StatefulWidget {
-  // Create a global key to access the state
-  static final GlobalKey<_HomeScreenState> homeKey =
-      GlobalKey<_HomeScreenState>();
-
-  HomeScreen({Key? key}) : super(key: homeKey);
-
-  // Add this static method to navigate to cart
-  static void navigateToCart(BuildContext context) {
-    // Navigate to HomeScreen first (if not already there)
-    Navigator.of(context).popUntil((route) => route.isFirst);
-
-    // Access the state through the global key and change the selected tab
-    homeKey.currentState?.setSelectedTab(1); // 1 is the index for cart
-  }
+  const HomeScreen({Key? key}) : super(key: key);
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  late final NavigationService _navigationService;
   int _selectedIndex = 0;
 
-  static final List<Widget> _widgetOptions = <Widget>[
-    const ProductCatalogScreen(),
-    const CartScreen(),
-    const EducationScreen(),
+  static const List<Widget> _widgetOptions = <Widget>[
+    ProductCatalogScreen(),
+    CartScreen(),
+    EducationScreen(),
+    UserProfileScreen(), // Add UserProfileScreen to the widget options
   ];
 
-  // Method that can be called from the static method
-  void setSelectedTab(int index) {
+  @override
+  void initState() {
+    super.initState();
+    _navigationService = Provider.of<NavigationService>(context, listen: false);
+    _navigationService.addListener(_updateIndex);
+    _selectedIndex = _navigationService.currentTabIndex;
+  }
+
+  @override
+  void dispose() {
+    _navigationService.removeListener(_updateIndex);
+    super.dispose();
+  }
+
+  void _updateIndex(int index) {
     setState(() {
       _selectedIndex = index;
     });
   }
 
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    _navigationService.setCurrentTab(index);
   }
 
   @override
@@ -59,6 +61,8 @@ class _HomeScreenState extends State<HomeScreen> {
               // Implement search functionality
             },
           ),
+          // Remove the user profile button from app bar if you want it only in bottom navigation
+          // Or keep it for alternative navigation option
         ],
       ),
       body: _widgetOptions.elementAt(_selectedIndex),
@@ -76,10 +80,15 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: Icon(Icons.menu_book),
             label: 'Education',
           ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.account_circle),
+            label: 'Profile',
+          ),
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: Theme.of(context).colorScheme.secondary,
         onTap: _onItemTapped,
+        type: BottomNavigationBarType.fixed, // Important for 4+ items
       ),
     );
   }
