@@ -22,20 +22,23 @@ class ProductCard extends StatelessWidget {
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min, // Make column only take needed space
           children: [
             // Product image
             ClipRRect(
               borderRadius:
                   const BorderRadius.vertical(top: Radius.circular(10)),
-              child: Container(
-                height: 120,
-                width: double.infinity,
-                color: Colors.grey[300],
-                child: Center(
-                  child: Icon(
-                    Icons.pets,
-                    size: 50,
-                    color: Colors.grey[600],
+              child: AspectRatio(
+                aspectRatio: 16 / 9, // Use aspect ratio instead of fixed height
+                child: Container(
+                  width: double.infinity,
+                  color: Colors.grey[300],
+                  child: Center(
+                    child: Icon(
+                      Icons.pets,
+                      size: 50,
+                      color: Colors.grey[600],
+                    ),
                   ),
                 ),
               ),
@@ -45,6 +48,8 @@ class ProductCard extends StatelessWidget {
               padding: const EdgeInsets.all(8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize:
+                    MainAxisSize.min, // Make column only take needed space
                 children: [
                   // Product name
                   Text(
