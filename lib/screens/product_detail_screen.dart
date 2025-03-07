@@ -29,7 +29,6 @@ class ProductDetailScreen extends StatelessWidget {
       // Add to cart
       await _dbHelper.addToCart(product.id, 1);
 
-      // Debug again to confirm addition
       await _dbHelper.debugDatabase();
 
       ScaffoldMessenger.of(context).showSnackBar(

@@ -156,7 +156,7 @@ class DatabaseHelper {
     return await db.insert('users', {
       'email': email,
       'name': name,
-      'password': password, // In production, this should be hashed
+      'password': password,
     });
   }
 

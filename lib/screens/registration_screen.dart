@@ -77,7 +77,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 20),
-              // Logo or app name
               Icon(
                 Icons.pets,
                 size: 60,

@@ -191,7 +191,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   bool success = await authService.addAddress(address);
 
                   if (success) {
-                    // Clear controllers
                     _addressNameController.clear();
                     _streetController.clear();
                     _cityController.clear();
@@ -303,7 +302,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       await authService.addPaymentMethod(paymentMethod);
 
                   if (success) {
-                    // Clear controllers
                     _cardTypeController.clear();
                     _lastFourDigitsController.clear();
                     _cardholderNameController.clear();

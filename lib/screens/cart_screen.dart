@@ -23,7 +23,6 @@ class _CartScreenState extends State<CartScreen> {
     _loadCartItems();
   }
 
-  // Make sure to call this when returning to the cart tab
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -41,7 +40,6 @@ class _CartScreenState extends State<CartScreen> {
     try {
       final items = await _dbHelper.getCartItems();
 
-      // Debug print to check what we're getting from the database
       print("Cart items loaded: ${items.length}");
       for (var item in items) {
         print("Item: ${item.product.name}, Quantity: ${item.quantity}");

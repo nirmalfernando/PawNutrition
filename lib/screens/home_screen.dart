@@ -61,8 +61,6 @@ class _HomeScreenState extends State<HomeScreen> {
               // Implement search functionality
             },
           ),
-          // Remove the user profile button from app bar if you want it only in bottom navigation
-          // Or keep it for alternative navigation option
         ],
       ),
       body: _widgetOptions.elementAt(_selectedIndex),
@@ -88,7 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
         currentIndex: _selectedIndex,
         selectedItemColor: Theme.of(context).colorScheme.secondary,
         onTap: _onItemTapped,
-        type: BottomNavigationBarType.fixed, // Important for 4+ items
+        type: BottomNavigationBarType.fixed,
       ),
     );
   }

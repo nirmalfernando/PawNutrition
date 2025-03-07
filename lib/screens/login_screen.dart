@@ -72,7 +72,6 @@ class _LoginScreenState extends State<LoginScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 40),
-              // Logo or app name
               Icon(
                 Icons.pets,
                 size: 80,
@@ -90,7 +89,6 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 40),
 
-              // Error message
               if (_errorMessage != null)
                 Container(
                   padding: const EdgeInsets.all(12),

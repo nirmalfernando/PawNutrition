@@ -170,7 +170,6 @@ class EducationDetailScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
 
-                  // This would normally be populated with actual related products
                   ListTile(
                     leading: Container(
                       width: 50,
